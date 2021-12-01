@@ -69,9 +69,9 @@ public class GeneralServices {
     return resp;
     }
 
-    public HashMap<String, Object> listarPorMes(Integer mes) {
+    public HashMap<String, Object> listarPorMes() {
         List<Registro> lstDiario =  new ArrayList<>();
-                lstDiario = registroGastosRepository.findByMes(mes);
+                lstDiario = registroGastosRepository.findAll();
         HashMap<String, Object> resp = new HashMap<>();
         resp.put(_STATUS, 200);
         resp.put(_BODY, lstDiario);

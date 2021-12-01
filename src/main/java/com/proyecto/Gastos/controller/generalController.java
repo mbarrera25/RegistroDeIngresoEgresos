@@ -46,10 +46,9 @@ public class generalController {
     @PostMapping("/listarRegistros")
     public HashMap<String, Object> listarRegistros(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
         Map<String, Object> params = new ObjectMapper().readerFor(Map.class).readValue(json);
-        Integer mes 	= (params.containsKey(MES) && params.get(MES) != null) ? Integer.valueOf(params.get(MES).toString()) : null;
         HashMap<String, Object> resp = new HashMap<>();
 
-            resp = generalServices.listarPorMes(mes);
+            resp = generalServices.listarPorMes();
 
         return resp;
     }
