@@ -1,5 +1,7 @@
 package com.proyecto.Gastos.Bean;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 
 @Entity
@@ -13,9 +15,11 @@ public class TipoGastos {
     private Integer id;
 
     @Basic
+    @JsonProperty("nombre")
     @Column(name = "nombre")
     private String nombre;
 
+    @JsonProperty("tipo")
     @Column(name = "tipo")
     private Integer tipo;
 

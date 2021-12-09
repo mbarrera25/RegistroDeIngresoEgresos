@@ -2,6 +2,7 @@ package com.proyecto.Gastos.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.proyecto.Gastos.Bean.TipoGastos;
 import com.proyecto.Gastos.Services.GeneralServices;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -65,6 +66,16 @@ public class generalController {
         }
         return resp;
     }
+    @GetMapping("/listaGastos")
+    public HashMap<String, Object> listaGastos() throws JsonProcessingException {
+        HashMap<String, Object> resp = new HashMap<>();
+        try {
+            resp = generalServices.listarAllGastos();
+        } catch (Exception e) {
+            log.error(MSJ_ERROR + e.getMessage());
+        }
+        return resp;
+    }
 
     @PostMapping("/EditarRegistroDiarios")
     public HashMap<String, Object> EditarRegistroDiarios(@ApiBodyObject(clazz = String.class) @RequestBody String json) throws JsonProcessingException {
@@ -103,6 +114,16 @@ public class generalController {
         HashMap<String, Object> resp = new HashMap<>();
         try {
             resp = generalServices.totalesIngresosEgresos(mes);
+        } catch (Exception e) {
+            log.error(MSJ_ERROR + e.getMessage());
+        }
+        return resp;
+    }
+    @PostMapping("crearConcepto")
+    public HashMap<String, Object> crearConcepto(@ApiBodyObject(clazz = TipoGastos.class) @RequestBody TipoGastos dto) throws JsonProcessingException {
+        HashMap<String, Object> resp = new HashMap<>();
+        try {
+            resp = generalServices.crearConceptos(dto);
         } catch (Exception e) {
             log.error(MSJ_ERROR + e.getMessage());
         }

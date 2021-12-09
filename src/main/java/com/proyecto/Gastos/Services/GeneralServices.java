@@ -31,7 +31,6 @@ public class GeneralServices {
     @Autowired
     RegistroGastosRepository registroGastosRepository;
 
-
     public HashMap<String, Object> registroGastos( String fecha, Integer tipo, String proveedor, Double monto, Integer cuenta, String observaciones) {
         HashMap<String, Object> resp = new HashMap<>();
         try {
@@ -145,6 +144,23 @@ public class GeneralServices {
         resp.put(_STATUS, 200);
         resp.put(_BODY, lstRegistros);
 
+        return resp;
+    }
+
+    public HashMap<String, Object> crearConceptos(TipoGastos dto){
+        HashMap<String, Object> resp = new HashMap<>();
+        tipoGastosRepository.save(dto);
+        resp.put(_STATUS, 200);
+        resp.put(_BODY, MSJ_EXITO);
+        return resp;
+    }
+
+    public HashMap<String, Object> listarAllGastos() {
+        HashMap<String, Object> resp = new HashMap<>();
+        List<TipoGastos> listaGastos = new ArrayList<>();
+        listaGastos = tipoGastosRepository.listargastos();
+        resp.put(_STATUS, 200);
+        resp.put(_BODY, listaGastos);
         return resp;
     }
 }
