@@ -38,6 +38,7 @@ public class GeneralServices {
             Registro registro = new Registro();
             TipoGastos tipoGastos = tipoGastosRepository.findById(cuenta).get();
             Integer saldo = registroGastosRepository.consultarSaldo();
+            saldo = saldo==null ? 0 : saldo;
 
             Double total = tipo==INGRESO ? saldo + monto : saldo - monto;
 
@@ -71,7 +72,7 @@ public class GeneralServices {
 
     public HashMap<String, Object> listarPorMes() {
         List<Registro> lstDiario =  new ArrayList<>();
-                lstDiario = registroGastosRepository.findAll();
+                lstDiario = registroGastosRepository.listarRegistros();
         HashMap<String, Object> resp = new HashMap<>();
         resp.put(_STATUS, 200);
         resp.put(_BODY, lstDiario);
