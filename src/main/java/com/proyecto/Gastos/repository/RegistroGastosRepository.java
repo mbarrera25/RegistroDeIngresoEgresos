@@ -20,7 +20,7 @@ public interface RegistroGastosRepository extends JpaRepository<Registro,Integer
     @Query(nativeQuery = true, value = QUERY_SALDO_RECALCULADO)
     Integer consultarSaldoRecalcular(@Param("id") Integer id);
 
-    String QUERY_RECALCULAR = "select * from Registro where id >:id";
+    String QUERY_RECALCULAR = "select * from Registro where id >:id order by id";
     @Query(nativeQuery = true, value = QUERY_RECALCULAR)
     List<Registro> recalcularSaldo(@Param("id") Integer id);
 

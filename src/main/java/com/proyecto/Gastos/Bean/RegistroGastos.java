@@ -1,16 +1,17 @@
 package com.proyecto.Gastos.Bean;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "Registro_Gastos", schema = "dbo", catalog = "Gastos")
+@Table(name = "Registro", schema = "dbo", catalog = "Gastos")
 public class RegistroGastos {
     private int id;
     private Date fecha;
-    private String proveedor;
     private Double total;
     private String observaciones;
     private Integer mes;
@@ -31,6 +32,7 @@ public class RegistroGastos {
     }
 
     @Basic
+    @JsonProperty("fecha")
     @Column(name = "fecha")
     public Date getFecha() {
         return fecha;
@@ -41,16 +43,7 @@ public class RegistroGastos {
     }
 
     @Basic
-    @Column(name = "proveedor")
-    public String getProveedor() {
-        return proveedor;
-    }
-
-    public void setProveedor(String proveedor) {
-        this.proveedor = proveedor;
-    }
-
-    @Basic
+    @JsonProperty("total")
     @Column(name = "total")
     public Double getTotal() {
         return total;
@@ -61,6 +54,7 @@ public class RegistroGastos {
     }
 
     @Basic
+    @JsonProperty("observaciones")
     @Column(name = "observaciones")
     public String getObservaciones() {
         return observaciones;
@@ -71,6 +65,7 @@ public class RegistroGastos {
     }
 
     @Basic
+    @JsonProperty("mes")
     @Column(name = "mes")
     public Integer getMes() {
         return mes;
@@ -81,6 +76,7 @@ public class RegistroGastos {
     }
 
     @Basic
+    @JsonProperty("tipo")
     @Column(name = "tipo")
     public Integer getTipo() {
         return tipo;
@@ -91,6 +87,7 @@ public class RegistroGastos {
     }
 
     @Basic
+    @JsonProperty("monto")
     @Column(name = "monto")
     public Double getMonto() {
         return monto;
@@ -101,7 +98,8 @@ public class RegistroGastos {
     }
 
     @OneToOne
-    @JoinColumn(name = "id_gastos")
+    @JsonProperty("tipoGastos")
+    @JoinColumn(name = "cuenta")
     public TipoGastos getTipoGastos() {
         return tipoGastos;
     }
@@ -117,7 +115,6 @@ public class RegistroGastos {
         RegistroGastos that = (RegistroGastos) o;
         return id == that.id &&
                 Objects.equals(fecha, that.fecha) &&
-                Objects.equals(proveedor, that.proveedor) &&
                 Objects.equals(total, that.total) &&
                 Objects.equals(observaciones, that.observaciones) &&
                 Objects.equals(mes, that.mes) &&
@@ -128,6 +125,6 @@ public class RegistroGastos {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, fecha, proveedor, total, observaciones, mes, tipo, monto, cuenta);
+        return Objects.hash(id, fecha, total, observaciones, mes, tipo, monto, cuenta);
     }
 }

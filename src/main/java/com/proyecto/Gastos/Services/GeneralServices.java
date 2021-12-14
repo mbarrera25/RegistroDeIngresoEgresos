@@ -7,9 +7,17 @@ import com.proyecto.Gastos.repository.RegistroGastosRepository;
 import com.proyecto.Gastos.repository.TipoGastosRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -161,6 +169,54 @@ public class GeneralServices {
         listaGastos = tipoGastosRepository.listargastos();
         resp.put(_STATUS, 200);
         resp.put(_BODY, listaGastos);
+        return resp;
+    }
+
+    public HashMap<String,Object> donwloadReportExcel(List<Registro> list) throws IOException {
+        HashMap<String, Object> resp = new HashMap<>();
+        Workbook e = new HSSFWorkbook();
+        Date date = new Date();
+        String filename = "C:\\Users\\Mariana\\Desktop\\reporte\\reporte" +date.getTime()+ ".xls";
+        //String filename = "C:/NewExcelFile.xls";
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("FirstSheet");
+        HSSFRow rowhead = sheet.createRow((short) 0);
+        rowhead.createCell(0).setCellValue("fecha");
+        rowhead.createCell(1).setCellValue("tipo");
+        rowhead.createCell(2).setCellValue("concepto");
+        rowhead.createCell(3).setCellValue("ingreso");
+        rowhead.createCell(4).setCellValue("egreso");
+        rowhead.createCell(5).setCellValue("total");
+        rowhead.createCell(6).setCellValue("observaciones");
+        //rowhead.createCell(6).setCellValue("ingreso");
+
+        for (int i = 0; i < list.size(); i++) {
+            Registro reg = list.get(i);
+        HSSFRow row = sheet.createRow(i+1);
+            DateFormat formateadorFechaCorta = DateFormat.getDateInstance(DateFormat.MEDIUM);
+            row.createCell(0).setCellValue( formateadorFechaCorta.format(reg.getFecha()));
+            row.createCell(1).setCellValue(reg.getCuenta().getNombre());
+            row.createCell(2).setCellValue(reg.getConcepto());
+            if (reg.getTipo() == INGRESO) {
+                row.createCell(3).setCellValue(reg.getMonto());
+                row.createCell(4).setCellValue("0");
+            } else {
+                row.createCell(3).setCellValue("0");
+                row.createCell(4).setCellValue(reg.getMonto());
+            }
+            row.createCell(5).setCellValue(reg.getTotal());
+            row.createCell(6).setCellValue(reg.getObservaciones());
+
+        }
+
+
+        FileOutputStream fileOut = new FileOutputStream(filename);
+        workbook.write(fileOut);
+        fileOut.close();
+        System.out.println("Your excel file has been generated!");
+        resp.put(_STATUS, 200);
+        resp.put(_BODY, MSJ_EXITO);
+
         return resp;
     }
 }

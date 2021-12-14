@@ -2,6 +2,7 @@ package com.proyecto.Gastos.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.proyecto.Gastos.Bean.Registro;
 import com.proyecto.Gastos.Bean.TipoGastos;
 import com.proyecto.Gastos.Services.GeneralServices;
 import org.apache.logging.log4j.LogManager;
@@ -124,6 +125,17 @@ public class generalController {
         HashMap<String, Object> resp = new HashMap<>();
         try {
             resp = generalServices.crearConceptos(dto);
+        } catch (Exception e) {
+            log.error(MSJ_ERROR + e.getMessage());
+        }
+        return resp;
+    }
+
+    @PostMapping("donwloadReportExcel")
+    public HashMap<String, Object> crearConcepto(@ApiBodyObject(clazz = Registro.class) @RequestBody List<Registro> dto) throws JsonProcessingException {
+        HashMap<String, Object> resp = new HashMap<>();
+        try {
+            resp = generalServices.donwloadReportExcel(dto);
         } catch (Exception e) {
             log.error(MSJ_ERROR + e.getMessage());
         }

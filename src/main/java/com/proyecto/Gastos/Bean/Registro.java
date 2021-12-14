@@ -1,5 +1,7 @@
 package com.proyecto.Gastos.Bean;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -18,6 +20,7 @@ public class Registro {
     private TipoGastos cuenta;
 
     @Id
+    @JsonProperty("id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     public int getId() {
@@ -29,6 +32,7 @@ public class Registro {
     }
 
     @Basic
+    @JsonProperty("fecha")
     @Column(name = "fecha")
     public Date getFecha() {
         return fecha;
@@ -39,6 +43,7 @@ public class Registro {
     }
 
     @Basic
+    @JsonProperty("concepto")
     @Column(name = "concepto")
     public String getConcepto() {
         return concepto;
@@ -49,6 +54,7 @@ public class Registro {
     }
 
     @Basic
+    @JsonProperty("total")
     @Column(name = "total")
     public Double getTotal() {
         return total;
@@ -59,6 +65,7 @@ public class Registro {
     }
 
     @Basic
+    @JsonProperty("observaciones")
     @Column(name = "observaciones")
     public String getObservaciones() {
         return observaciones;
@@ -69,6 +76,7 @@ public class Registro {
     }
 
     @Basic
+    @JsonProperty("mes")
     @Column(name = "mes")
     public Integer getMes() {
         return mes;
@@ -79,6 +87,7 @@ public class Registro {
     }
 
     @Basic
+    @JsonProperty("tipo")
     @Column(name = "tipo")
     public Integer getTipo() {
         return tipo;
@@ -88,10 +97,8 @@ public class Registro {
         this.tipo = tipo;
     }
 
-
-
-
     @OneToOne
+    @JsonProperty("cuenta")
     @JoinColumn(name = "cuenta")
     public TipoGastos getCuenta() {
         return cuenta;
@@ -100,7 +107,9 @@ public class Registro {
     public void setCuenta(TipoGastos cuenta) {
         this.cuenta = cuenta;
     }
+
     @Basic
+    @JsonProperty("monto")
     @Column(name = "monto")
 
     public Double getMonto() {
