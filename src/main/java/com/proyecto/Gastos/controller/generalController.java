@@ -132,7 +132,7 @@ public class generalController {
     }
 
     @PostMapping("donwloadReportExcel")
-    public HashMap<String, Object> crearConcepto(@ApiBodyObject(clazz = Registro.class) @RequestBody List<Registro> dto) throws JsonProcessingException {
+    public HashMap<String, Object> donwloadReportExcel(@ApiBodyObject(clazz = Registro.class) @RequestBody List<Registro> dto) throws JsonProcessingException {
         HashMap<String, Object> resp = new HashMap<>();
         try {
             resp = generalServices.donwloadReportExcel(dto);
