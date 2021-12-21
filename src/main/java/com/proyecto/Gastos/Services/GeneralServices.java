@@ -3,6 +3,7 @@ package com.proyecto.Gastos.Services;
 import com.proyecto.Gastos.Bean.Registro;
 import com.proyecto.Gastos.Bean.RegistroGastos;
 import com.proyecto.Gastos.Bean.TipoGastos;
+import com.proyecto.Gastos.GastosApplication;
 import com.proyecto.Gastos.repository.RegistroGastosRepository;
 import com.proyecto.Gastos.repository.TipoGastosRepository;
 import org.apache.logging.log4j.LogManager;
@@ -10,25 +11,21 @@ import org.apache.logging.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static com.proyecto.Gastos.constantes.constante_respuestas.*;
-import static com.proyecto.Gastos.constantes.generalConstantes.EGRESOS;
-import static com.proyecto.Gastos.constantes.generalConstantes.INGRESO;
+import static com.proyecto.Gastos.constantes.generalConstantes.*;
 
 @Service
 public class GeneralServices {
@@ -176,10 +173,12 @@ public class GeneralServices {
         HashMap<String, Object> resp = new HashMap<>();
         Workbook e = new HSSFWorkbook();
         Date date = new Date();
-        String filename = "C:\\Users\\Mariana\\Desktop\\reporte\\reporte" +date.getTime()+ ".xls";
+        Properties properties = (Properties) this.getProperties();
+
+        String filename = properties.getProperty("ruta.url.reportes") + "reporte" +date.getTime()+ ".xls";
         //String filename = "C:/NewExcelFile.xls";
         HSSFWorkbook workbook = new HSSFWorkbook();
-        HSSFSheet sheet = workbook.createSheet("FirstSheet");
+        HSSFSheet sheet = workbook.createSheet("reporte");
         HSSFRow rowhead = sheet.createRow((short) 0);
         rowhead.createCell(0).setCellValue("fecha");
         rowhead.createCell(1).setCellValue("tipo");
@@ -217,6 +216,104 @@ public class GeneralServices {
         resp.put(_STATUS, 200);
         resp.put(_BODY, MSJ_EXITO);
 
+        return resp;
+    }
+    public Object getProperties() throws IOException {
+        Properties p = new Properties();
+        Properties properties = new Properties();
+        InputStream file = null;
+        file = GastosApplication.class.getClassLoader().getResourceAsStream("application.properties");
+        p.load(file);
+        properties.put("ruta.url.reportes", p.getProperty("ruta.url.reportes"));
+        return properties;
+    }
+
+    public HashMap<String, Object> generarReporteRsumen(List<Registro> lstRegistros) throws IOException {
+        HashMap<String, Object> resp = new HashMap<>();
+        Workbook e = new HSSFWorkbook();
+        Date date = new Date();
+        Properties properties = (Properties) this.getProperties();
+
+        String filename = properties.getProperty("ruta.url.reportes")  + "RESUMEN_CUENTAS" +date.getTime()+ ".xls";
+        //String filename = "C:/NewExcelFile.xls";
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        HSSFSheet sheet = workbook.createSheet("Resumen");
+        CellStyle cellStyle = workbook.createCellStyle();
+        Font cellFont = workbook.createFont();
+        cellFont.setBoldweight(Font.BOLDWEIGHT_BOLD);
+        cellStyle.setFont(cellFont);
+        HSSFRow rowTitle = sheet.createRow((short) 0);
+        rowTitle.createCell(2).setCellValue("RESUMEN DE CUENTAS");
+        List<TipoGastos> ingresosLst = tipoGastosRepository.findByTipo(1);
+        List<TipoGastos> egresosLst = tipoGastosRepository.findByTipo(2);
+        HSSFRow rowHead = sheet.createRow((short) 1);
+        HSSFRow row3 = sheet.createRow((short) 2);
+        row3.createCell(1).setCellValue("INGRESOS");
+        //List<Registro> registrosList = registroGastosRepository.findAll();
+            Double totalIngreso = 0.0;
+        for (int i = 0; i < ingresosLst.size(); i++) {
+            HSSFRow rowTotal = sheet.createRow((short) 3);
+            Double total = 0.0;
+            Integer gasto = 0;
+            for (Registro reg:
+                    lstRegistros) {
+                if (ingresosLst.get(i).getId()==reg.getCuenta().getId()){
+                    total = reg.getMonto().doubleValue() + total;
+                    gasto = reg.getCuenta().getId();
+                }
+            }
+        rowHead.createCell(2+i).setCellValue(ingresosLst.get(i).getNombre());
+        rowHead.getCell(2+i).setCellStyle(cellStyle);
+            if (ingresosLst.get(i).getId()==gasto){
+            row3.createCell(2+i).setCellValue(total);
+            }
+                totalIngreso = totalIngreso + total;
+        }
+        rowHead.createCell(ingresosLst.size()+2).setCellValue("TOTAL INGRESOS");
+        rowHead.getCell(ingresosLst.size()+2).setCellStyle(cellStyle);
+        row3.createCell(ingresosLst.size()+2).setCellValue(totalIngreso);
+
+
+        HSSFRow rowEgresos = sheet.createRow((short) 4);
+        rowEgresos.createCell(1).setCellValue("EGRESOS");
+        Double totalEgreso =0.0;
+        for (int i = 0; i < egresosLst.size(); i++) {
+            Double total = 0.0;
+            Integer gasto = 0;
+            HSSFRow row4 = sheet.createRow(i+5);
+            row4.createCell(2).setCellValue(egresosLst.get(i).getNombre());
+            for (Registro reg :
+                    lstRegistros) {
+                if (egresosLst.get(i).getId()==reg.getCuenta().getId()){
+                    total = reg.getMonto().doubleValue() + total;
+                    gasto = reg.getCuenta().getId();
+                }
+            }
+            if (egresosLst.get(i).getId()==gasto){
+                row4.createCell(ingresosLst.size()+2).setCellValue(total);
+            }
+            totalEgreso = totalEgreso + total;
+            //row4.createCell(ingresosLst.size()+2).setCellValue(totalEgreso);
+            //row4.getCell(ingresosLst.size()+2).setCellStyle(cellStyle);
+    }
+        HSSFRow rowTotalTitulo = sheet.createRow(egresosLst.size()+7);
+        rowTotalTitulo.createCell(1).setCellValue("TOTAL EGRESOS");
+        rowTotalTitulo.getCell(1).setCellStyle(cellStyle);
+        rowTotalTitulo.createCell(ingresosLst.size()+2).setCellValue(totalEgreso);
+        rowTotalTitulo.getCell(ingresosLst.size()+2).setCellStyle(cellStyle);
+
+       HSSFRow rowSaldo = sheet.createRow(egresosLst.size()+10);
+       rowSaldo.createCell(1).setCellValue("SALDO");
+       rowSaldo.getCell(1).setCellStyle(cellStyle);
+       rowSaldo.createCell(ingresosLst.size()+2).setCellValue(totalIngreso-totalEgreso);
+        rowSaldo.getCell(ingresosLst.size()+2).setCellStyle(cellStyle);
+
+        FileOutputStream fileOut = new FileOutputStream(filename);
+        workbook.write(fileOut);
+        fileOut.close();
+        System.out.println("Your excel file has been generated!");
+        resp.put(_STATUS, 200);
+        resp.put(_BODY, MSJ_EXITO);
         return resp;
     }
 }

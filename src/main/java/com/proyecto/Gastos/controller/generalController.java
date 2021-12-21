@@ -131,11 +131,21 @@ public class generalController {
         return resp;
     }
 
-    @PostMapping("donwloadReportExcel")
+    @PostMapping("reporteGeneral")
     public HashMap<String, Object> donwloadReportExcel(@ApiBodyObject(clazz = Registro.class) @RequestBody List<Registro> dto) throws JsonProcessingException {
         HashMap<String, Object> resp = new HashMap<>();
         try {
             resp = generalServices.donwloadReportExcel(dto);
+        } catch (Exception e) {
+            log.error(MSJ_ERROR + e.getMessage());
+        }
+        return resp;
+    }
+    @PostMapping("reporteResumen")
+    public HashMap<String, Object> reporte(@ApiBodyObject(clazz = Registro.class) @RequestBody List<Registro> lstRegistros) throws JsonProcessingException {
+        HashMap<String, Object> resp = new HashMap<>();
+        try {
+           resp = generalServices.generarReporteRsumen(lstRegistros);
         } catch (Exception e) {
             log.error(MSJ_ERROR + e.getMessage());
         }
