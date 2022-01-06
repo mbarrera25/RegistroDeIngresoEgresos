@@ -151,4 +151,14 @@ public class generalController {
         }
         return resp;
     }
+    @PostMapping("deleteGasto")
+    public HashMap<String, Object> deleteGasto(@ApiBodyObject(clazz = Registro.class) @RequestBody TipoGastos tipoGastos) throws JsonProcessingException {
+        HashMap<String, Object> resp = new HashMap<>();
+        try {
+            resp = generalServices.deleteGastos(tipoGastos);
+        } catch (Exception e) {
+            log.error(MSJ_ERROR + e.getMessage());
+        }
+        return resp;
+    }
 }

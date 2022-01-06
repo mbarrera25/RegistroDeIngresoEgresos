@@ -41,23 +41,32 @@ public class GeneralServices {
         try {
             Registro registro = new Registro();
             TipoGastos tipoGastos = tipoGastosRepository.findById(cuenta).get();
-            Integer saldo = registroGastosRepository.consultarSaldo();
-            saldo = saldo==null ? 0 : saldo;
+            Integer saldo =0;
+            Double total = 0.00;
+            if (tipoGastos.getId()==94){
+                saldo = registroGastosRepository.consultarSaldo();
+                monto = Double.valueOf(saldo);
+                total = monto;
+            }else {
+                 saldo = registroGastosRepository.consultarSaldo();
+                saldo = saldo == null ? 0 : saldo;
 
-            Double total = tipo==INGRESO ? saldo + monto : saldo - monto;
+                 total = tipo == INGRESO ? saldo + monto : saldo - monto;
+            }
+                Date fecha1=new SimpleDateFormat("dd/MM/yyyy").parse(fecha);
+                LocalDate localDate = fecha1.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-            Date fecha1=new SimpleDateFormat("dd/MM/yyyy").parse(fecha);
-            LocalDate localDate = fecha1.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                registro.setTipo(tipo);
+                registro.setFecha(fecha1);
+                registro.setMes(localDate.getMonth().getValue());
+                registro.setConcepto(proveedor);
+                registro.setMonto(monto);
+                registro.setTotal(total);
+                registro.setCuenta(tipoGastos);
+                registro.setObservaciones(observaciones);
+                registro = registroGastosRepository.save(registro);
 
-            registro.setTipo(tipo);
-            registro.setFecha(fecha1);
-            registro.setMes(localDate.getMonth().getValue());
-            registro.setConcepto(proveedor);
-            registro.setMonto(monto);
-            registro.setTotal(total);
-            registro.setCuenta(tipoGastos);
-            registro.setObservaciones(observaciones);
-            registro = registroGastosRepository.save(registro);
+
             resp.put(_STATUS, 200);
             resp.put(_BODY,registro );
         } catch (Exception e) {
@@ -257,14 +266,14 @@ public class GeneralServices {
             Integer gasto = 0;
             for (Registro reg:
                     lstRegistros) {
-                if (ingresosLst.get(i).getId()==reg.getCuenta().getId()){
+                if (ingresosLst.get(i).getId().equals(reg.getCuenta().getId())){
                     total = reg.getMonto().doubleValue() + total;
                     gasto = reg.getCuenta().getId();
                 }
             }
         rowHead.createCell(2+i).setCellValue(ingresosLst.get(i).getNombre());
         rowHead.getCell(2+i).setCellStyle(cellStyle);
-            if (ingresosLst.get(i).getId()==gasto){
+            if (ingresosLst.get(i).getId().equals(gasto)){
             row3.createCell(2+i).setCellValue(total);
             }
                 totalIngreso = totalIngreso + total;
@@ -284,12 +293,12 @@ public class GeneralServices {
             row4.createCell(2).setCellValue(egresosLst.get(i).getNombre());
             for (Registro reg :
                     lstRegistros) {
-                if (egresosLst.get(i).getId()==reg.getCuenta().getId()){
+                if (egresosLst.get(i).getId().equals(reg.getCuenta().getId())){
                     total = reg.getMonto().doubleValue() + total;
                     gasto = reg.getCuenta().getId();
                 }
             }
-            if (egresosLst.get(i).getId()==gasto){
+            if (egresosLst.get(i).getId().equals(gasto)){
                 row4.createCell(ingresosLst.size()+2).setCellValue(total);
             }
             totalEgreso = totalEgreso + total;
@@ -312,6 +321,30 @@ public class GeneralServices {
         workbook.write(fileOut);
         fileOut.close();
         System.out.println("Your excel file has been generated!");
+        resp.put(_STATUS, 200);
+        resp.put(_BODY, MSJ_EXITO);
+        return resp;
+    }
+
+    public HashMap<String, Object> deleteGastos(TipoGastos tipoGastos) {
+        HashMap<String, Object> resp = new HashMap<>();
+        List<Registro> registos = registroGastosRepository.findByCuenta(tipoGastos);
+
+        if (registos.size()>0){
+            resp.put(_STATUS, 400);
+            resp.put(_BODY, "No se puede eliminar el tipo de Gasto porque existen movmientios registrados en el.");
+        }else {
+            tipoGastosRepository.delete(tipoGastos);
+            resp.put(_STATUS, 200);
+            resp.put(_BODY, MSJ_EXITO);
+        }
+        return resp;
+    }
+
+    public HashMap<String, Object> cierreMes() {
+        HashMap<String, Object> resp = new HashMap<>();
+
+
         resp.put(_STATUS, 200);
         resp.put(_BODY, MSJ_EXITO);
         return resp;

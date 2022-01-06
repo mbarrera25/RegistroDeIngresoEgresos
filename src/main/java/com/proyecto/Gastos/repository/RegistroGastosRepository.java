@@ -2,6 +2,7 @@ package com.proyecto.Gastos.repository;
 
 import com.proyecto.Gastos.Bean.Registro;
 import com.proyecto.Gastos.Bean.RegistroGastos;
+import com.proyecto.Gastos.Bean.TipoGastos;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +29,5 @@ public interface RegistroGastosRepository extends JpaRepository<Registro,Integer
     @Query(nativeQuery = true, value = LISTAR_REGISTROS)
     List<Registro> listarRegistros();
 
+    List<Registro> findByCuenta(TipoGastos tipo);
 }
