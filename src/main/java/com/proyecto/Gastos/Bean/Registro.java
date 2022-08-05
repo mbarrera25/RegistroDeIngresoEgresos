@@ -3,7 +3,6 @@ package com.proyecto.Gastos.Bean;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
 
